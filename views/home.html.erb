@@ -5,16 +5,62 @@
 <% if message %>
   <p class="message"><%= message %></p>
 <% end %>
+<ul class="explainer">
+<li>
+  Queries with <span class="example">i:</span> in them are Google Image searched.
+  <ul>
+    <li><a class="example" href="/?q=i:best dogs">i:best dogs</a></li>
+    <li><a class="example" href="/?q=capybaras and rabbits i:">capybaras and rabbits i:</a></li>
+  </ul>
+<li>
+  Queries that start with alphanumeric characters followed by <span class="example">:</span> are DuckDuckGo'd with that bang.
+  <ul>
+    <li><a class="example" href="/?q=mdn:HTMLInputElement">mdn:HTMLInputElement</a></li>
+    <li><a class="example" href="/?q=typescript:Partial">typescript:Partial</a></li>
+    <li><a class="example" href="/?q=github:ruby/ruby">github:ruby/ruby</a></li>
+    <li><a class="example" href="/?q=twitter:skpd__">twitter:skpd__</a></li>
+    <li><a class="example" href="/?q=maps:zambrero">maps:zambrero</a></li>
+  </ul>
+</li>
+<li>
+  Anything else is Google searched.
+  <ul>
+    <li><a class="example" href="/?q=asmr zoroastrian chant download">asmr zoroastrian chant download</a></li>
+    <li><a class="example" href="/?q=biggest slug">biggest slug</a></li>
+  </ul>
+</li>
+</ul>
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function() {
     const q = document.querySelector('input[name="q"]')
+    const submit = document.querySelector('input[type="submit"]')
 
     const prep = function() {
       q.focus()
       q.select()
     };
-
     window.addEventListener('focus', prep);
     prep();
+
+    const highlightExamples = function() {
+      document.querySelectorAll('a.example').forEach(function(a) {
+        if (q.value === a.textContent) {
+          a.classList.add('highlighted')
+        } else {
+          a.classList.remove('highlighted')
+        }
+      })
+    }
+
+    q.addEventListener('keyup', highlightExamples)
+    document.addEventListener('click', function(e) {
+      if (e.target.matches('a.example')) {
+        e.preventDefault()
+        e.stopPropagation()
+        q.value = e.target.textContent
+        highlightExamples()
+        submit.focus()
+      }
+    }, false);
   });
 </script>

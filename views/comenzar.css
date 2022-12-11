@@ -7,14 +7,32 @@ body {
   line-height: 20px;
   color: #333333;
 }
-h1, h1 a {
-  color: #333333;
+h1, h1 a, h1 a:visited {
+  color: steelblue;
   font-size: 36px;
-  font-weight: 300;
+  font-weight: 800;
   line-height: 36px;
   margin: 0 0 18px;
   text-shadow: 0 1px 0 #ffffff;
   text-decoration: none;
+}
+.example {
+  font-family: monospace;
+  background: #fff;
+  border: 1px solid #d7d7d7;
+  border-radius: 3px;
+  padding: 0px 4px;
+
+}
+a.example {
+  text-decoration: none;
+}
+a.example, a.example:visited {
+  color: olivedrab
+}
+a.example:focus-within, a.example.highlighted {
+  background-color: yellowgreen;
+  color: #333;
 }
 form {
   margin: 18px 0;
@@ -75,20 +93,9 @@ input[type="submit"]:active {
   border-color: #999999;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   outline: 0;
-  outline: thin dotted \9;
-  /* IE6-9 */
 }
-input[type="submit"][disabled],
-input[type="submit"][disabled]:hover,
-input[type="submit"][disabled]:focus,
-input[type="submit"][disabled]:active {
-  background-color: #e6e6e6;
-  background-image: none;
-  border-color: #adadad;
-  box-shadow: none;
-  cursor: default;
-  opacity: 0.65;
-  filter: alpha(opacity=65);
+input[type="submit"]:focus-within, input[type="submit"]:focus-visible {
+  outline: #6c975f auto 1px;
 }
 input:-moz-placeholder {
   color: #999999;
