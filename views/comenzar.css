@@ -104,13 +104,21 @@ input::-webkit-input-placeholder {
   color: #999999;
 }
 p.message {
-  background-color: #f5f5f5;
-  background-image: linear-gradient(to bottom, #ffffff, #f5f5f5);
+  background-color: #e6f0ff;
   background-repeat: repeat-x;
+  background-image: linear-gradient(to bottom, #ffffff, #e6f0ff);
   border: 1px solid #cccccc;
   border-radius: 4px;
   color: #333333;
   margin: 18px 0;
   padding: 8px 35px 8px 14px;
   text-shadow: 0 1px 0 #ffffff;
+}
+.bunnywave {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  vertical-align: bottom;
+  background-image: url(/bunnywave.png);
+  background-size: contain;
 }

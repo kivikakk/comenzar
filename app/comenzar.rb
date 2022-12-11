@@ -12,13 +12,24 @@ DUCKDUCKGO_SEARCH = "https://duckduckgo.com/"
 
 CHEWWO = /\A[^a-z0-9]*(hi|hello|hey|heya|chewwo|yawonk|hola|howdy)[^a-z0-9]*\z/i
 
+STATICS = T.let({
+  "adc" => "https://adc.hrzn.ee",
+  "ing" => "https://www.ing.com.au/securebanking/",
+  "28d" => "https://servicecentre.latitudefinancial.com.au/login",
+}, T::Hash[String, String])
+
+STATIC_MATCH = T.let(Regexp.union(STATICS.keys.map {|k| /\A#{k}\z/i }), Regexp)
+
 class Comenzar < Hanami::API
   get "/" do
     headers["Referrer-Policy"] = "no-referrer"
-    q = params[:q]
+    headers["X-Robots-Tag"] = "noindex"
 
-    next ok(views.home) if !q || q.strip.empty?
-    next ok(views.home(q:, message: "Chewwo!")) if q =~ CHEWWO
+    q = params[:q]&.strip || ""
+
+    next ok(views.home) if q.empty?
+    next ok(views.home(q:, message: "Chewwo!!!! <span class='bunnywave'></span>")) if q =~ CHEWWO
+    next redirect(STATICS[q]) if q =~ STATIC_MATCH
 
     if q.sub!(/(\A|\s)i:/i, "")
       next add_qsp(GOOGLE_IMAGE_SEARCH, q:)
@@ -32,13 +43,18 @@ class Comenzar < Hanami::API
   end
 
   get "/comenzar.css" do
-    [200, {"Content-Type" => "text/css"}, views.css]
+    ok(views.css, ct: ContentType::CSS)
+  end
+
+  get "/bunnywave.png" do
+    ok(views.bunnywave, ct: ContentType::PNG)
   end
 
   class ContentType < T::Enum
     enums do
       HTML = new("text/html")
       CSS = new("text/css")
+      PNG = new("image/png")
     end
   end
 
@@ -48,7 +64,7 @@ class Comenzar < Hanami::API
 
     sig {params(body: String, ct: ContentType).returns(T.untyped)}
     def ok(body, ct: ContentType::HTML)
-      [200, {"Content-Type" => ct.to_s}, body]
+      [200, {"Content-Type" => ct.serialize}, body]
     end
 
     sig {params(url: String, params: String).returns(T.untyped)}

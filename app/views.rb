@@ -14,6 +14,7 @@ class Views
     @layout = T.let(parse(root.join("layout.html.erb"), "layout(content)"), T.untyped)
     @home = T.let(parse(root.join("home.html.erb"), "home(q, message)"), T.untyped)
     @css = T.let(root.join("comenzar.css").read, String)
+    @bunnywave = T.let(root.join("bunnywave.png").read(encoding: Encoding::ASCII_8BIT), String)
   end
 
   sig {params(q: T.nilable(String), message: T.nilable(String)).returns(String)}
@@ -27,6 +28,9 @@ class Views
 
   sig {returns(String)}
   attr_reader :css
+
+  sig {returns(String)}
+  attr_reader :bunnywave
 
   private
 
