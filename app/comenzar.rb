@@ -6,6 +6,7 @@ require "cgi"
 
 GOOGLE_SEARCH = "https://google.com/search?hl=en"
 GOOGLE_IMAGE_SEARCH = "https://google.com/search?hl=en&tbm=isch"
+DUCKDUCKGO_SEARCH = "https://duckduckgo.com/"
 
 class Comenzar < Hanami::API
   extend T::Sig
@@ -17,6 +18,10 @@ class Comenzar < Hanami::API
 
     if q.sub!(/(\A|\s)i:/i, '')
       next add_qsp(GOOGLE_IMAGE_SEARCH, q:)
+    end
+
+    if q.sub!(/(\A|\s)ddg:/i, '')
+      next add_qsp(DUCKDUCKGO_SEARCH, q:)
     end
 
     next add_qsp(GOOGLE_SEARCH, q:)
