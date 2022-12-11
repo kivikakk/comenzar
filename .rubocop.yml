@@ -1,0 +1,68 @@
+---
+# The behavior of RuboCop can be controlled via the .rubocop.yml
+# configuration file. It makes it possible to enable/disable
+# certain cops (checks) and to alter their behavior if they accept
+# any parameters. The file can be placed either in your home
+# directory or in some project directory.
+#
+# RuboCop will start looking for the configuration file in the directory
+# where the inspected file is and continue its way up to the root directory.
+#
+# See https://docs.rubocop.org/rubocop/configuration
+AllCops:
+  TargetRubyVersion: 3.1
+Bundler:
+  Enabled: false
+Gemspec:
+  Enabled: false
+Layout:
+  Enabled: false
+Layout/EmptyLineAfterMagicComment:
+  Enabled: true
+  Severity: info
+Layout/SpaceAfterColon:
+  Enabled: true
+  Severity: info
+Layout/SpaceBeforeComma:
+  Enabled: true
+  Severity: info
+Layout/SpaceInsideParens:
+  Enabled: true
+  EnforcedStyle: no_space
+  Severity: info
+Lint:
+  Enabled: false
+Metrics:
+  Enabled: false
+Naming:
+  Enabled: false
+Performance:
+  Enabled: false
+RSpec:
+  Enabled: false
+Rails:
+  Enabled: false
+Security:
+  Enabled: false
+Style:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  AutoCorrect: true
+  Enabled: true
+  EnforcedStyle: always
+  SafeAutoCorrect: true
+  Severity: info
+Style/HashSyntax:
+  Enabled: true
+  EnforcedShorthandSyntax: always
+  EnforcedStyle: ruby19
+  Severity: info
+Style/StringLiterals:
+  AutoCorrect: false
+  Enabled: true
+  EnforcedStyle: double_quotes
+  Severity: info
+require:
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
