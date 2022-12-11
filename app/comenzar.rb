@@ -14,6 +14,7 @@ CHEWWO = /\A[^a-z0-9]*(hi|hello|hey|heya|chewwo|yawonk|hola|howdy)[^a-z0-9]*\z/i
 
 STATICS = T.let({
   "adc" => "https://adc.hrzn.ee",
+  "ynab" => "https://app.youneedabudget.com/",
   "ing" => "https://www.ing.com.au/securebanking/",
   "28d" => "https://servicecentre.latitudefinancial.com.au/login",
 }, T::Hash[String, String])
