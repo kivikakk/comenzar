@@ -38,6 +38,7 @@ GEM
       sorbet-static (= 0.5.10588)
     sorbet-runtime (0.5.10588)
     sorbet-static (0.5.10588-universal-darwin-21)
+    sorbet-static (0.5.10588-x86_64-linux)
     sorbet-static-and-runtime (0.5.10588)
       sorbet (= 0.5.10588)
       sorbet-runtime (= 0.5.10588)
@@ -67,6 +68,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   hanami-api!
