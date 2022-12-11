@@ -39,6 +39,8 @@ class Comenzar < Hanami::API
       next add_qsp(DUCKDUCKGO_SEARCH, q: "!#$1 #{q}")
     end
 
+    q.sub!(/(\A|\s)(!g|g!)(\z|\s)/i, "")
+
     next add_qsp(GOOGLE_SEARCH, q:)
   end
 
