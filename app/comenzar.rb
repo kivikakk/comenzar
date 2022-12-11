@@ -5,16 +5,21 @@ require "uri"
 require "cgi"
 
 GOOGLE_SEARCH = "https://google.com/search?hl=en"
+GOOGLE_IMAGE_SEARCH = "https://google.com/search?hl=en&tbm=isch"
 
 class Comenzar < Hanami::API
   extend T::Sig
 
   get "/" do
     headers["Referrer-Policy"] = "no-referrer"
-    if q = params[:q]
-      next add_qsp(GOOGLE_SEARCH, q:)
+    q = params[:q]
+    next redirect "/nyonk", 302 if !q
+
+    if q.sub!(/(\A|\s)i:/i, '')
+      next add_qsp(GOOGLE_IMAGE_SEARCH, q:)
     end
-    redirect "/nyonk", 302
+
+    next add_qsp(GOOGLE_SEARCH, q:)
   end
 
   module Qsp
