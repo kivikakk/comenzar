@@ -17,6 +17,6 @@ class Comenzar
   end
 
   class BlockContext < ::Hanami::API::Block::Context
-    include ::Comenzar::Qsp
+    include ::Comenzar::Heppers
   end
 end

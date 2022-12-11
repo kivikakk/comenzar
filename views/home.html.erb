@@ -1,0 +1,20 @@
+<form action="/" method="get">
+  <input type="text" name="q" placeholder="Query" <% if q %>value="<%= q %>"<% end %>>
+  <input type="submit" value="Search">
+</form>
+<% if message %>
+  <p class="message"><%= message %></p>
+<% end %>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const q = document.querySelector('input[name="q"]')
+
+    const prep = function() {
+      q.focus()
+      q.select()
+    };
+
+    window.addEventListener('focus', prep);
+    prep();
+  });
+</script>
