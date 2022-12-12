@@ -119,6 +119,30 @@ p.message {
   width: 20px;
   height: 20px;
   vertical-align: bottom;
-  background-image: url(/bunnywave.png);
+  background-image: url(bunnywave.png);
   background-size: contain;
+}
+.milla {
+  display: inline-block;
+  width: 56px;
+  height: 39px;
+  vertical-align: bottom;
+  background-image: url(milladig.png);
+  background-size: contain;
+}
+.milla:hover {
+  background-image: url(milladig.gif);
+}
+body::after {
+  /* Preload the gif so it doesn't flash on hover. */
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+  content: url(milladig.gif);
+}
+
+ul.explainer > li:not(:first-child):not(:last-child) {
+  margin-bottom: 14px;
 }

@@ -5,11 +5,19 @@ require "uri"
 require "cgi"
 
 require_relative "views"
+require_relative "assets"
+require_relative "spider"
+
+SPIDER = T.let(spider do
+  free(:i).qsp("https://google.com/search?hl=en&tbm=isch", :q)
+  free(:sw).replace("https://en.wiktionary.org/wiki/{query}#Spanish", space: "_")
+  free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
+  free(:enes).replace("https://translate.google.com/?source=osdd&sl=en&tl=es&text={query}&op=translate")
+  free(:esen).replace("https://translate.google.com/?source=osdd&sl=es&tl=en&text={query}&op=translate")
+end, Spider)
 
 GOOGLE_SEARCH = "https://google.com/search?hl=en"
-GOOGLE_IMAGE_SEARCH = "https://google.com/search?hl=en&tbm=isch"
 DUCKDUCKGO_SEARCH = "https://duckduckgo.com/"
-
 CHEWWO = /\A[^a-z0-9]*(hi|hello|hey|heya|chewwo|yawonk|hola|howdy)[^a-z0-9]*\z/i
 
 STATICS = T.let({
@@ -30,10 +38,9 @@ class Comenzar < Hanami::API
 
     next ok(views.home) if q.empty?
     next ok(views.home(q:, message: "Chewwo!!!! <span class='bunnywave'></span>")) if q =~ CHEWWO
-    next redirect(STATICS[q]) if q =~ STATIC_MATCH
-
-    if q.sub!(/(\A|\s)i:/i, "")
-      next add_qsp(GOOGLE_IMAGE_SEARCH, q:)
+    next redirect(STATICS[q], 302) if q =~ STATIC_MATCH
+    if out = SPIDER.(q)
+      next redirect(out, 302)
     end
 
     if q.sub!(/\A(\w+):/i, "")
@@ -45,28 +52,18 @@ class Comenzar < Hanami::API
     next add_qsp(GOOGLE_SEARCH, q:)
   end
 
-  get "/comenzar.css" do
-    ok(views.css, ct: ContentType::CSS)
-  end
-
-  get "/bunnywave.png" do
-    ok(views.bunnywave, ct: ContentType::PNG)
-  end
-
-  class ContentType < T::Enum
-    enums do
-      HTML = new("text/html")
-      CSS = new("text/css")
-      PNG = new("image/png")
-    end
+  get "/assets/:path" do |path|
+    asset = assets.for(T.must(params[:path])) \
+      or next status 404
+    ok(asset.body, ct: asset.content_type)
   end
 
   module Heppers
     extend T::Sig, T::Generic
     requires_ancestor {BlockContext}
 
-    sig {params(body: String, ct: ContentType).returns(T.untyped)}
-    def ok(body, ct: ContentType::HTML)
+    sig {params(body: String, ct: Views::ContentType).returns(T.untyped)}
+    def ok(body, ct: Views::ContentType::HTML)
       [200, {"Content-Type" => ct.serialize}, body]
     end
 
@@ -82,6 +79,11 @@ class Comenzar < Hanami::API
     sig {returns(Views)}
     def views
       @views ||= T.let(Views.new(Pathname.new(__dir__).join("..", "views")), T.nilable(Views))
+    end
+
+    sig {returns(Assets)}
+    def assets
+      @assets ||= T.let(Assets.new(Pathname.new(__dir__).join("..", "assets")), T.nilable(Assets))
     end
   end
 

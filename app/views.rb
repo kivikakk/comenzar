@@ -6,6 +6,15 @@ require "erb"
 class Views
   extend T::Sig
 
+  class ContentType < T::Enum
+    enums do
+      HTML = new("text/html")
+      CSS = new("text/css")
+      PNG = new("image/png")
+      GIF = new("image/gif")
+    end
+  end
+
   sig {params(root: Pathname).void}
   def initialize(root)
     @holder = T.let(Class.new.new, Object)
@@ -13,8 +22,6 @@ class Views
 
     @layout = T.let(parse(root.join("layout.html.erb"), "layout(content)"), T.untyped)
     @home = T.let(parse(root.join("home.html.erb"), "home(q, message)"), T.untyped)
-    @css = T.let(root.join("comenzar.css").read, String)
-    @bunnywave = T.let(root.join("bunnywave.png").read(encoding: Encoding::ASCII_8BIT), String)
   end
 
   sig {params(q: T.nilable(String), message: T.nilable(String)).returns(String)}
@@ -25,12 +32,6 @@ class Views
       @layout.call(@home.call(q, message))
     end
   end
-
-  sig {returns(String)}
-  attr_reader :css
-
-  sig {returns(String)}
-  attr_reader :bunnywave
 
   private
 

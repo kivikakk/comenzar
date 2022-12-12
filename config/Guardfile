@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+# typed: false
+
+directories %w(app assets config sorbet views) \
+ .select{|d| Dir.exist?(d) ? d : UI.warning("Directory #{d} does not exist")}
+
+guard "rack", port: 9292 do
+  watch(/./)
+end
