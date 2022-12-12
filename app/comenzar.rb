@@ -32,7 +32,7 @@ class Comenzar < Hanami::API
       raise NotImplementedError, "unhandled spider response"
     end
 
-    if q.sub!(/\A(\w+):/i, "")
+    if q.sub!(/\A(\w+):(?!:)/i, "")
       next add_qsp(DUCKDUCKGO_SEARCH, q: "!#$1 #{q}")
     end
 
