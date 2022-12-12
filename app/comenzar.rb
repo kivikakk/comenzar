@@ -7,23 +7,10 @@ require "cgi"
 require_relative "views"
 require_relative "assets"
 require_relative "spider"
-
-SPIDER = T.let(spider do
-  free(:i).qsp("https://google.com/search?hl=en&tbm=isch", :q)
-  free(:sw).replace("https://en.wiktionary.org/wiki/{query}#Spanish", space: "_")
-  free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
-  free(:enes).replace("https://translate.google.com/?source=osdd&sl=en&tl=es&text={query}&op=translate")
-  free(:esen).replace("https://translate.google.com/?source=osdd&sl=es&tl=en&text={query}&op=translate")
-
-  static(:adc).redirect("https://adc.hrzn.ee")
-  static(:ynab).redirect("https://app.youneedabudget.com/")
-  static(:ing).redirect("https://www.ing.com.au/securebanking/")
-  static(:"28d").redirect("https://servicecentre.latitudefinancial.com.au/login")
-end, Spider)
+require_relative "../web"
 
 GOOGLE_SEARCH = "https://google.com/search?hl=en"
 DUCKDUCKGO_SEARCH = "https://duckduckgo.com/"
-CHEWWO = /\A[^a-z0-9]*(hi|hello|hey|heya|chewwo|yawonk|hola|howdy)[^a-z0-9]*\z/i
 
 class Comenzar < Hanami::API
   get "/" do
@@ -33,9 +20,16 @@ class Comenzar < Hanami::API
     q = params[:q]&.strip || ""
 
     next ok(views.home) if q.empty?
-    next ok(views.home(q:, message: "Chewwo!!!! <span class='bunnywave'></span>")) if q =~ CHEWWO
-    if out = SPIDER.(q)
-      next redirect(out, 302)
+
+    case SPIDER.(q)
+    in redirect: url
+      next redirect(url, 302)
+    in message:
+      next ok(views.home(q:, message:))
+    in NilClass
+      # pass
+    else
+      raise NotImplementedError, "unhandled spider response"
     end
 
     if q.sub!(/\A(\w+):/i, "")
@@ -44,7 +38,7 @@ class Comenzar < Hanami::API
 
     q.sub!(/(\A|\s)(!g|g!)(\z|\s)/i, "")
 
-    next add_qsp(GOOGLE_SEARCH, q:)
+    add_qsp(GOOGLE_SEARCH, q:)
   end
 
   get "/assets/:path" do |path|

@@ -18,6 +18,11 @@ end
 class Spider
   extend T::Sig
 
+  Response = T.type_alias { T.any(
+    { redirect: String },
+    { message: String },
+  ) }
+
   class DSL
     extend T::Sig
 
@@ -32,10 +37,14 @@ class Spider
       @matchers[token] = Free.new(token)
     end
 
-    sig {params(token: Symbol).returns(Static)}
-    def static(token)
-      raise "token #{token} already defined" if @matchers[token]
-      @matchers[token] = Static.new(token)
+    sig {params(tokens: Symbol).returns(Static)}
+    def static(*tokens)
+      matcher = Static.new(tokens)
+      tokens.each do |token|
+        raise "token #{token} already defined" if @matchers[token]
+        @matchers[token] = matcher
+      end
+      matcher
     end
 
     sig {returns(Spider)}
@@ -51,7 +60,7 @@ class Spider
       sig {abstract.returns(T::Boolean)}
       def valid?; end
 
-      sig {abstract.params(q: String).returns(T.nilable(String))}
+      sig {abstract.params(q: String).returns(T.nilable(Response))}
       def match(q); end
     end
 
@@ -69,7 +78,7 @@ class Spider
         @rewriter != nil
       end
 
-      sig {override.params(q: String).returns(T.nilable(String))}
+      sig {override.params(q: String).returns(T.nilable(Response))}
       def match(q)
         if rem = q.dup.sub!(@regexp, "")
           T.must(@rewriter).rewrite(rem)
@@ -90,27 +99,32 @@ class Spider
     class Static < Matcher
       extend T::Sig
 
-      sig {params(token: Symbol).void}
-      def initialize(token)
-        @regexp = T.let(/\A#{token}\z/i, Regexp)
-        @url = T.let(nil, T.nilable(String))
+      sig {params(tokens: T::Array[Symbol]).void}
+      def initialize(tokens)
+        @regexp = T.let(Regexp.union(tokens.map {|token| /\A#{token}\z/i}), Regexp)
+        @response = T.let(nil, T.nilable(Response))
       end
 
       sig {override.returns(T::Boolean)}
       def valid?
-        @url != nil
+        @response != nil
       end
 
-      sig {override.params(q: String).returns(T.nilable(String))}
+      sig {override.params(q: String).returns(T.nilable(Response))}
       def match(q)
         if q =~ @regexp
-          @url
+          @response
         end
       end
 
       sig {params(url: String).void}
       def redirect(url)
-        @url = url
+        @response = { redirect: url }
+      end
+
+      sig {params(message: String).void}
+      def message(message)
+        @response = { message: }
       end
     end
 
@@ -118,7 +132,7 @@ class Spider
       extend T::Sig, T::Helpers
       abstract!
 
-      sig {abstract.params(q: String).returns(String)}
+      sig {abstract.params(q: String).returns(Response)}
       def rewrite(q); end
     end
 
@@ -131,13 +145,13 @@ class Spider
         @param = param
       end
 
-      sig {override.params(q: String).returns(String)}
+      sig {override.params(q: String).returns(Response)}
       def rewrite(q)
         uri = URI.parse(@url)
         query = CGI.parse(uri.query || "")
         query.merge!(@param => q)
         uri.query = URI.encode_www_form(query)  
-        uri.to_s
+        { redirect: uri.to_s }
       end
     end
 
@@ -150,9 +164,9 @@ class Spider
         @space = space
       end
 
-      sig {override.params(q: String).returns(String)}
+      sig {override.params(q: String).returns(Response)}
       def rewrite(q)
-        @url.sub("{query}", q.gsub(" ", @space))
+        { redirect: @url.sub("{query}", q.gsub(" ", @space)) }
       end
     end
   end
@@ -162,7 +176,7 @@ class Spider
     @matchers = matchers
   end
 
-  sig {params(q: String).returns(T.nilable(String))}
+  sig {params(q: String).returns(T.nilable(Response))}
   def call(q)
     @matchers.find do |matcher|
       if result = matcher.match(q)

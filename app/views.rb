@@ -20,18 +20,22 @@ class Views
     @holder = T.let(Class.new.new, Object)
     @rendered = T.let({}, T::Hash[Symbol, String])
 
-    @layout = T.let(parse(root.join("layout.html.erb"), "layout(content)"), T.untyped)
+    @layout = T.let(parse(root.join("layout.html.erb"), "layout"), T.untyped)
     @home = T.let(parse(root.join("home.html.erb"), "home(q, message)"), T.untyped)
+    @explainer = T.let(parse(root.join("_explainer.html.erb"), "explainer").call, String)
   end
 
   sig {params(q: T.nilable(String), message: T.nilable(String)).returns(String)}
   def home(q: nil, message: nil)
     if !q && !message
-      @home_nil ||= T.let(T.let(@layout.call(@home.call(nil, nil)), String), T.nilable(String))
+      @home_nil ||= T.let(T.let(@layout.call { @home.call(nil, nil) }, String), T.nilable(String))
     else
-      @layout.call(@home.call(q, message))
+      @layout.call { @home.call(q, message) }
     end
   end
+
+  sig {returns(String)}
+  attr_reader :explainer
 
   private
 
