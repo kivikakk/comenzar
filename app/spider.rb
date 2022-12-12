@@ -32,6 +32,12 @@ class Spider
       @matchers[token] = Free.new(token)
     end
 
+    sig {params(token: Symbol).returns(Static)}
+    def static(token)
+      raise "token #{token} already defined" if @matchers[token]
+      @matchers[token] = Static.new(token)
+    end
+
     sig {returns(Spider)}
     def resolve!
       raise "all matchers must be valid" unless @matchers.values.all?(&:valid?)
@@ -54,7 +60,6 @@ class Spider
 
       sig {params(token: Symbol).void}
       def initialize(token)
-        @token = token
         @regexp = T.let(/(\A|\s)#{token}:/i, Regexp)
         @rewriter = T.let(nil, T.nilable(Rewriter))
       end
@@ -79,6 +84,33 @@ class Spider
       sig {params(url: String, space: String).void}
       def replace(url, space: "%20")
         @rewriter = Replace.new(url:, space:)
+      end
+    end
+
+    class Static < Matcher
+      extend T::Sig
+
+      sig {params(token: Symbol).void}
+      def initialize(token)
+        @regexp = T.let(/\A#{token}\z/i, Regexp)
+        @url = T.let(nil, T.nilable(String))
+      end
+
+      sig {override.returns(T::Boolean)}
+      def valid?
+        @url != nil
+      end
+
+      sig {override.params(q: String).returns(T.nilable(String))}
+      def match(q)
+        if q =~ @regexp
+          @url
+        end
+      end
+
+      sig {params(url: String).void}
+      def redirect(url)
+        @url = url
       end
     end
 

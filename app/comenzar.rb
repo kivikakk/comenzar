@@ -14,20 +14,16 @@ SPIDER = T.let(spider do
   free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
   free(:enes).replace("https://translate.google.com/?source=osdd&sl=en&tl=es&text={query}&op=translate")
   free(:esen).replace("https://translate.google.com/?source=osdd&sl=es&tl=en&text={query}&op=translate")
+
+  static(:adc).redirect("https://adc.hrzn.ee")
+  static(:ynab).redirect("https://app.youneedabudget.com/")
+  static(:ing).redirect("https://www.ing.com.au/securebanking/")
+  static(:"28d").redirect("https://servicecentre.latitudefinancial.com.au/login")
 end, Spider)
 
 GOOGLE_SEARCH = "https://google.com/search?hl=en"
 DUCKDUCKGO_SEARCH = "https://duckduckgo.com/"
 CHEWWO = /\A[^a-z0-9]*(hi|hello|hey|heya|chewwo|yawonk|hola|howdy)[^a-z0-9]*\z/i
-
-STATICS = T.let({
-  "adc" => "https://adc.hrzn.ee",
-  "ynab" => "https://app.youneedabudget.com/",
-  "ing" => "https://www.ing.com.au/securebanking/",
-  "28d" => "https://servicecentre.latitudefinancial.com.au/login",
-}, T::Hash[String, String])
-
-STATIC_MATCH = T.let(Regexp.union(STATICS.keys.map {|k| /\A#{k}\z/i }), Regexp)
 
 class Comenzar < Hanami::API
   get "/" do
@@ -38,7 +34,6 @@ class Comenzar < Hanami::API
 
     next ok(views.home) if q.empty?
     next ok(views.home(q:, message: "Chewwo!!!! <span class='bunnywave'></span>")) if q =~ CHEWWO
-    next redirect(STATICS[q], 302) if q =~ STATIC_MATCH
     if out = SPIDER.(q)
       next redirect(out, 302)
     end
