@@ -1,47 +1,46 @@
 # frozen_string_literal: true
-# typed: strict
 
 require "erb"
 
 class Views
-  extend T::Sig
-
-  class ContentType < T::Enum
-    enums do
-      HTML = new("text/html")
-      CSS = new("text/css")
-      PNG = new("image/png")
-      GIF = new("image/gif")
+  class ContentType
+    def initialize(mime)
+      @mime = mime
     end
+
+    def serialize
+      @mime
+    end
+
+    HTML = new("text/html")
+    CSS = new("text/css")
+    PNG = new("image/png")
+    GIF = new("image/gif")
   end
 
-  sig {params(root: Pathname).void}
   def initialize(root)
-    @holder = T.let(Class.new.new, Object)
-    @rendered = T.let({}, T::Hash[Symbol, String])
+    @holder = Class.new.new
+    @rendered = {}
 
-    @layout = T.let(parse(root.join("layout.html.erb"), "layout"), T.untyped)
-    @home = T.let(parse(root.join("home.html.erb"), "home(q, message)"), T.untyped)
-    @explainer = T.let(parse(root.join("_explainer.html.erb"), "explainer").call, String)
+    @layout = parse(root.join("layout.html.erb"), "layout")
+    @home = parse(root.join("home.html.erb"), "home(q, message)")
+    @explainer = parse(root.join("_explainer.html.erb"), "explainer").call
   end
 
-  sig {params(q: T.nilable(String), message: T.nilable(String)).returns(String)}
   def home(q: nil, message: nil)
     if !q && !message
-      @home_nil ||= T.let(T.let(@layout.call { @home.call(nil, nil) }, String), T.nilable(String))
+      @home_nil ||= @layout.call { @home.call(nil, nil) }
     else
       @layout.call { @home.call(q, message) }
     end
   end
 
-  sig {returns(String)}
   attr_reader :explainer
 
   private
 
-  sig {params(path: Pathname, proto: String).returns(T.untyped)}
   def parse(path, proto)
-    fname = T.unsafe(ERB.new(path.read)).def_method(@holder.class, proto, path.to_s)
+    fname = ERB.new(path.read).def_method(@holder.class, proto, path.to_s)
     @holder.method(fname)
   end
 end

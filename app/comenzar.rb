@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# typed: strict
 
 require "uri"
 require "cgi"
@@ -42,21 +41,16 @@ class Comenzar < Hanami::API
   end
 
   get "/assets/:path" do |path|
-    asset = assets.for(T.must(params[:path])) \
+    asset = assets.for(params[:path]) \
       or next status 404
     ok(asset.body, ct: asset.content_type)
   end
 
   module Heppers
-    extend T::Sig, T::Generic
-    requires_ancestor {BlockContext}
-
-    sig {params(body: String, ct: Views::ContentType).returns(T.untyped)}
     def ok(body, ct: Views::ContentType::HTML)
       [200, {"Content-Type" => ct.serialize}, body]
     end
 
-    sig {params(url: String, params: String).returns(T.untyped)}
     def add_qsp(url, **params)
       uri = URI.parse(url)
       query = CGI.parse(uri.query || "")
@@ -65,14 +59,12 @@ class Comenzar < Hanami::API
       redirect uri.to_s, 302
     end
 
-    sig {returns(Views)}
     def views
-      @views ||= T.let(Views.new(Pathname.new(__dir__).join("..", "views")), T.nilable(Views))
+      @views ||= Views.new(Pathname.new(__dir__).join("..", "views"))
     end
 
-    sig {returns(Assets)}
     def assets
-      @assets ||= T.let(Assets.new(Pathname.new(__dir__).join("..", "assets")), T.nilable(Assets))
+      @assets ||= Assets.new(Pathname.new(__dir__).join("..", "assets"))
     end
   end
 

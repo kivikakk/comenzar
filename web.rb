@@ -1,7 +1,6 @@
 # frozen_string_literal: true
-# typed: strict
 
-SPIDER = T.let(spider do
+SPIDER = spider do
   free(:i).qsp("https://google.com/search?hl=en&tbm=isch", :q)
   free(:sw).replace("https://en.wiktionary.org/wiki/{query}#Spanish", space: "_")
   free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
@@ -16,4 +15,4 @@ SPIDER = T.let(spider do
   static(:hi, :hello, :hey, :heya, :chewwo, :yawonk, :hola, :howdy).message(<<~HTML)
    Chewwo!!!! <span class='bunnywave'></span>
   HTML
-end, Spider)
+end

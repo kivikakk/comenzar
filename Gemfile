@@ -5,11 +5,7 @@ source "https://rubygems.org"
 gem "hanami-api", github: "hanami/api"
 gem "puma"
 
-gem "sorbet-runtime"
-
 group :development do
-  gem "sorbet"
-  gem "tapioca", require: false
   gem "guard"
   gem "guard-rack"
 end
