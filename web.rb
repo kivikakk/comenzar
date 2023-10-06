@@ -3,9 +3,10 @@
 SPIDER = spider do
   free(:i).qsp("https://google.com/search?hl=en&tbm=isch", :q)
   free(:sw).replace("https://en.wiktionary.org/wiki/{query}#Spanish", space: "_")
+  free(:rw).replace("https://en.wiktionary.org/wiki/{query}#Russian", space: "_")
   free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
 
-  %w(en es ru).permutation(2).each do |sl, tl|
+  %w(en es ru ja).permutation(2).each do |sl, tl|
     free(:"#{sl}#{tl}").replace("https://translate.google.com/?source=osdd&sl=#{sl}&tl=#{tl}&text={query}&op=translate")
   end
 
