@@ -12,6 +12,7 @@ SPIDER = spider do
     free(:"#{sl}#{tl}").replace("https://translate.google.com/?source=osdd&sl=#{sl}&tl=#{tl}&text={query}&op=translate")
   end
 
+  static(:adc).redirect("https://adc.hrzn.ee")
   static(:ynab).redirect("https://app.ynab.com/")
   static(:ing).redirect("https://www.ing.com.au/securebanking/")
   static(:lhv).redirect("https://www.lhv.ee/ibank/cf/portfolio/view?vi=0")
