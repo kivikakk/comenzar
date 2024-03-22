@@ -17,7 +17,7 @@ SPIDER = spider do
   static(:ing).redirect("https://www.ing.com.au/securebanking/")
   static(:lhv).redirect("https://www.lhv.ee/ibank/cf/portfolio/view?vi=0")
 
-  static(:hi, :hello, :hey, :heya, :chewwo, :yawonk, :hola, :howdy).message(<<~HTML)
+  static(:hi, :hello, :hey, :heya, :chewwo, :nyonk, :yawonk, :hola, :howdy).message(<<~HTML)
    Chewwo!!!! <span class='bunnywave'></span>
   HTML
 end
