@@ -5,7 +5,7 @@ SPIDER = spider do
   free(:sw).replace("https://en.wiktionary.org/wiki/{query}#Spanish", space: "_")
   free(:rw).replace("https://en.wiktionary.org/wiki/{query}#Russian", space: "_")
   free(:ew).replace("https://en.wiktionary.org/wiki/{query}#Estonian", space: "_")
-  free(:sv).replace("https://sonaveeb.ee/search/unif/dlall/dsall/{query}?lang=en")
+  free(:sv).replace("https://sonaveeb.ee/search/unif/est/dsall/{query}?lang=en")
   free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
 
   %w(en es ru ja et nl de).permutation(2).each do |sl, tl|
