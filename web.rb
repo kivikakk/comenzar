@@ -6,7 +6,10 @@ SPIDER = spider do
   free(:rw).replace("https://en.wiktionary.org/wiki/{query}#Russian", space: "_")
   free(:ew).replace("https://en.wiktionary.org/wiki/{query}#Estonian", space: "_")
   free(:sv).replace("https://sonaveeb.ee/search/unif/est/dsall/{query}?lang=en")
-  free(:auslan).replace("https://find.auslan.fyi/search?query={query}")
+  free(:auslan).qsp("https://find.auslan.fyi/search", :query)
+
+  free(:iben).qsp("http://dict.ibs.ee/translate.cgi?language=English", :word)
+  free(:ibet).qsp("http://dict.ibs.ee/translate.cgi?language=Estonian", :word)
 
   %w(en es ru ja et nl de).permutation(2).each do |sl, tl|
     free(:"#{sl}#{tl}").replace("https://translate.google.com/?source=osdd&sl=#{sl}&tl=#{tl}&text={query}&op=translate")
