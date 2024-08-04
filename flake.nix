@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/release-23.11;
+    nixpkgs.url = github:NixOS/nixpkgs/release-24.05;
     flake-utils.url = github:numtide/flake-utils;
   };
 
@@ -50,6 +50,46 @@
           ruby
           env
         ];
+      };
+
+      nixosModules.default = {
+        config,
+        lib,
+        pkgs,
+        ...
+      }: let
+        cfg = config.services.comenzar;
+        inherit (lib) mkIf mkEnableOption mkOption types;
+      in {
+        options.services.comenzar = {
+          enable = mkEnableOption "Enable the comenzar service";
+
+          package = mkOption {
+            type = types.package;
+            default = self.packages.${system}.default;
+            description = "Package to use for comenzar (defaults to this flake's).";
+          };
+
+          logFile = mkOption {
+            type = types.nullOr types.path;
+            default = null;
+            description = "The logfile to use for the comenzar service.";
+          };
+        };
+
+        config = mkIf (cfg.enable) {
+          systemd.services.comenzar = {
+            description = "Comenzar web search helper!";
+            wantedBy = ["multi-user.target"];
+
+            serviceConfig = {
+              DynamicUser = "yes";
+              ExecStart = "${cfg.package}/bin/comenzar";
+              Restart = "on-failure";
+              RestartSec = "5s";
+            };
+          };
+        };
       };
 
       darwinModules.default = {
