@@ -11,7 +11,7 @@ SPIDER = spider do
   free(:iben).qsp("http://dict.ibs.ee/translate.cgi?language=English", :word)
   free(:ibet).qsp("http://dict.ibs.ee/translate.cgi?language=Estonian", :word)
 
-  %w(en es ru ja et nl de fi).permutation(2).each do |sl, tl|
+  %w(en es ru ja et de fi pt).permutation(2).each do |sl, tl|
     free(:"#{sl}#{tl}").replace("https://translate.google.com/?source=osdd&sl=#{sl}&tl=#{tl}&text={query}&op=translate")
   end
 
